@@ -28,3 +28,32 @@ itemsRouter.get("/:id", async (request, response) => {
 
   response.json(item);
 });
+
+itemsRouter.post("/", async (request, response) => {
+  const db = await openDb();
+
+  const { name, description, quantity } = request.body;
+
+  if (!name || !description || quantity === undefined) {
+    response.status(400).json({
+      message: "Missing required fields",
+    });
+
+    return;
+  }
+
+  const result = await db.run(
+    `
+      INSERT INTO items (userId, name, description, quantity)
+      VALUES (?, ?, ?, ?)
+    `,
+    1,
+    name,
+    description,
+    quantity,
+  );
+
+  const item = await db.get("SELECT * FROM items WHERE id = ?", result.lastID);
+
+  response.status(201).json(item);
+});
