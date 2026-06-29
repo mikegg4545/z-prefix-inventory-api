@@ -23,6 +23,25 @@ app.get("/items", async (_request, response) => {
   response.json(items);
 });
 
+app.get("/items/:id", async (request, response) => {
+  const db = await openDb();
+
+  const item = await db.get(
+    "SELECT * FROM items WHERE id = ?",
+    request.params.id,
+  );
+
+  if (!item) {
+    response.status(404).json({
+      message: "Item not found",
+    });
+
+    return;
+  }
+
+  response.json(item);
+});
+
 async function startServer() {
   await openDb();
 
