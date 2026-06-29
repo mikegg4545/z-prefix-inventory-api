@@ -57,3 +57,49 @@ itemsRouter.post("/", async (request, response) => {
 
   response.status(201).json(item);
 });
+
+itemsRouter.put("/:id", async (request, response) => {
+  const db = await openDb();
+
+  const { name, description, quantity } = request.body;
+
+  if (!name || !description || quantity === undefined) {
+    response.status(400).json({
+      message: "Missing required fields",
+    });
+
+    return;
+  }
+
+  const existingItem = await db.get(
+    "SELECT * FROM items WHERE id = ?",
+    request.params.id,
+  );
+
+  if (!existingItem) {
+    response.status(404).json({
+      message: "Item not found",
+    });
+
+    return;
+  }
+
+  await db.run(
+    `
+      UPDATE items
+      SET name = ?, description = ?, quantity = ?
+      WHERE id = ?
+    `,
+    name,
+    description,
+    quantity,
+    request.params.id,
+  );
+
+  const updatedItem = await db.get(
+    "SELECT * FROM items WHERE id = ?",
+    request.params.id,
+  );
+
+  response.json(updatedItem);
+});
