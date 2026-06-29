@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import { openDb } from "./db";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +16,12 @@ app.get("/health", (_request, response) => {
   response.json({ status: "ok" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Inventory API is running on http://localhost:${PORT}`);
-});
+async function startServer() {
+  await openDb();
+
+  app.listen(PORT, () => {
+    console.log(`Inventory API is running on http://localhost:${PORT}`);
+  });
+}
+
+startServer();
