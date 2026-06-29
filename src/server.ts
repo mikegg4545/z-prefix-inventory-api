@@ -16,6 +16,13 @@ app.get("/health", (_request, response) => {
   response.json({ status: "ok" });
 });
 
+app.get("/items", async (_request, response) => {
+  const db = await openDb();
+  const items = await db.all("SELECT * FROM items");
+
+  response.json(items);
+});
+
 async function startServer() {
   await openDb();
 

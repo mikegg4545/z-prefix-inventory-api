@@ -26,5 +26,15 @@ export async function openDb() {
     );
   `);
 
+  await db.run(`
+    INSERT OR IGNORE INTO users (id, firstName, lastName, username, password)
+    VALUES (1, 'Demo', 'User', 'demo', 'password')
+  `);
+
+  await db.run(`
+    INSERT OR IGNORE INTO items (id, userId, name, description, quantity)
+    VALUES (1, 1, 'Laptop', 'Work laptop for inventory testing', 3)
+  `);
+
   return db;
 }
