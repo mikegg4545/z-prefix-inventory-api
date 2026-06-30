@@ -103,3 +103,24 @@ itemsRouter.put("/:id", async (request, response) => {
 
   response.json(updatedItem);
 });
+
+itemsRouter.delete("/:id", async (request, response) => {
+  const db = await openDb();
+
+  const existingItem = await db.get(
+    "SELECT * FROM items WHERE id = ?",
+    request.params.id,
+  );
+
+  if (!existingItem) {
+    response.status(404).json({
+      message: "Item not found",
+    });
+
+    return;
+  }
+
+  await db.run("DELETE FROM items WHERE id = ?", request.params.id);
+
+  response.status(204).send();
+});
